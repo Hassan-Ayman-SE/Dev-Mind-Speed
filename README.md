@@ -71,6 +71,11 @@
    ```bash
    npm start
    ```
+   You should see:
+   ```aries
+   Connected to MongoDB
+   Server running at http://localhost:4000/
+   ```
 
 ### Development Mode
 
