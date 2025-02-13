@@ -1,14 +1,50 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import Game from "../models/Game";
 import { generateEquation } from "../utils/equationGenerator";
 import mongoose from "mongoose";
 
 //1- Start a New Game (POST /game/start)
-export const startGame = async (req: Request, res: Response): Promise<Response> => {
+// export const startGame = async (req: Request, res: Response): Promise<Response> => {
+//   const { name, difficulty } = req.body;
+//   if (!name || !difficulty) {
+//    return res.status(400).json({ error: "Missing parameters ):" });
+   
+//   }
+
+//   try {
+//     const equation = generateEquation(difficulty);
+//     const game = new Game({
+//       name,
+//       difficulty,
+//       currentQuestion: {
+//         ...equation,
+//         startTime: new Date(),
+//       },
+//     });
+//     await game.save();
+
+//    return res.status(201).json({
+//       message: `Hello ${name}, find your submit API URL below`,
+//       submit_url: `/game/${game._id}/submit`,
+//       question: equation.equation,
+//       time_started: game.currentQuestion.startTime,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({ error: "Internal server error" });
+//   }
+// };
+
+
+export const startGame: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { name, difficulty } = req.body;
   if (!name || !difficulty) {
-   return res.status(400).json({ error: "Missing parameters ):" });
-   
+    res.status(400).json({ error: "Missing parameters ):" });
+    return;
+    
   }
 
   try {
@@ -23,38 +59,44 @@ export const startGame = async (req: Request, res: Response): Promise<Response> 
     });
     await game.save();
 
-   return res.status(201).json({
+ 
+    res.status(201).json({
       message: `Hello ${name}, find your submit API URL below`,
       submit_url: `/game/${game._id}/submit`,
       question: equation.equation,
       time_started: game.currentQuestion.startTime,
     });
   } catch (error) {
-    return res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
+
 //================================================================
 //2- Submit an Answer (POST /game/{game_id}/submit)
-export const submitAnswer = async (req: Request, res: Response): Promise<Response> => {
+export const submitAnswer: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { game_id } = req.params;
   const { answer } = req.body;
 
   if (!mongoose.Types.ObjectId.isValid(game_id)) {
-    return res.status(400).json({ error: "Invalid game ID ):" });
-    
+    res.status(400).json({ error: "Invalid game ID ):" });
+    return;
   }
 
   if (!answer) {
-    return res.status(400).json({ error: "Missing answer" });
-    
+    res.status(400).json({ error: "Missing answer" });
+    return;
   }
 
   try {
     const game = await Game.findById(game_id);
     if (!game) {
-     return res.status(404).json({ error: "Game not found ):" });
-      
+      res.status(404).json({ error: "Game not found ):" });
+      return;
     }
 
     // Calculate time taken and check if correct
@@ -86,37 +128,39 @@ export const submitAnswer = async (req: Request, res: Response): Promise<Respons
 
     await game.save();
 
-    return res.json({
-     result: isCorrect ? `Good job ${game.name}!` : `Sorry ${game.name}.`,
-     time_taken: timeTaken,
-     current_score: game.correctAnswers / game.totalQuestions,
-     history: game.history,
-     question: newEquation.equation,
-   });
+    res.json({
+      result: isCorrect ? `Good job ${game.name}!` : `Sorry ${game.name}.`,
+      time_taken: timeTaken,
+      current_score: game.correctAnswers / game.totalQuestions,
+      history: game.history,
+      question: newEquation.equation,
+    });
   } catch (error) {
-    return res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
+    return;
   }
 };
 
 //================================================================
 //3- Get Game Status (GET /game/{game_id}/status)
-export const getGameStatus = async (
+export const getGameStatus: RequestHandler = async (
   req: Request,
-  res: Response
-): Promise<Response> => {
+  res: Response,
+  next: NextFunction
+) => {
   const { game_id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(game_id)) {
-    return res.status(400).json({ error: "Invalid game ID ):" });
-    
+    res.status(400).json({ error: "Invalid game ID ):" });
+    return;
   }
 
   //calculate the total time spent on all questions
   try {
     const game = await Game.findById(game_id);
     if (!game) {
-      return res.status(404).json({ error: "Game not found ):" });
-      
+      res.status(404).json({ error: "Game not found ):" });
+      return;
     }
 
     const total_time_spent = game.history.reduce(
@@ -124,7 +168,7 @@ export const getGameStatus = async (
       0
     );
 
-    return res.json({
+    res.json({
       name: game.name,
       difficulty: game.difficulty,
       current_score:
@@ -135,6 +179,7 @@ export const getGameStatus = async (
       history: game.history,
     });
   } catch (error) {
-    return res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error" });
+    return;
   }
 };
