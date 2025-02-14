@@ -3,38 +3,6 @@ import Game from "../models/Game";
 import { generateEquation } from "../utils/equationGenerator";
 import mongoose from "mongoose";
 
-//1- Start a New Game (POST /game/start)
-// export const startGame = async (req: Request, res: Response): Promise<Response> => {
-//   const { name, difficulty } = req.body;
-//   if (!name || !difficulty) {
-//    return res.status(400).json({ error: "Missing parameters ):" });
-   
-//   }
-
-//   try {
-//     const equation = generateEquation(difficulty);
-//     const game = new Game({
-//       name,
-//       difficulty,
-//       currentQuestion: {
-//         ...equation,
-//         startTime: new Date(),
-//       },
-//     });
-//     await game.save();
-
-//    return res.status(201).json({
-//       message: `Hello ${name}, find your submit API URL below`,
-//       submit_url: `/game/${game._id}/submit`,
-//       question: equation.equation,
-//       time_started: game.currentQuestion.startTime,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({ error: "Internal server error" });
-//   }
-// };
-
-
 export const startGame: RequestHandler = async (
   req: Request,
   res: Response,
