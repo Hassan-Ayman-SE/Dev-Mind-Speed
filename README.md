@@ -1,8 +1,8 @@
 # Dev-Mind-Speed
 
-## Overview
+## Overview (MongoDB / Mongoose)
 
-**Dev Mind Speed** is a backend-based math game designed to test players' speed and accuracy in solving math equations through API calls. Built with Node.js, Express, and TypeScript. Integrated with a MongoDB database to manage game sessions, questions, and responses.
+**Dev Mind Speed** is a backend-based math game designed to test players’ speed and accuracy in solving math equations through API calls. Built with Node.js, Express, and TypeScript, this branch uses **MongoDB with Mongoose** to manage game sessions, questions, and responses. It showcases how the application handles database interactions in a NoSQL environment.
 
 ## Features
 
