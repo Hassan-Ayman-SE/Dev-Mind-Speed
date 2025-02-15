@@ -1,28 +1,24 @@
-import request from "supertest";
-import mongoose from "mongoose";
-import app from "../src/app"; 
-import Game from "../src/models/Game"; 
+import request, { Response } from "supertest";
+import app from "../src/app";
+import Game from "../src/models/GameMySQL"; 
+import sequelize from "../src/utils/sequelize";
 
 describe("Game API Tests", () => {
   beforeAll(async () => {
-    const testURI =
-      process.env.MONGO_URI_TEST ||
-      "mongodb://localhost:27017/dev-mind-speed-test-db";
-    await mongoose.connect(testURI);
+    await sequelize.sync({ force: true });
   });
 
   afterAll(async () => {
-    await mongoose.connection.dropDatabase();
-    await mongoose.disconnect();
+    await sequelize.close();
   });
 
   beforeEach(async () => {
-    await Game.deleteMany({});
+    await Game.destroy({ where: {} });
   });
 
   describe("POST /game/start", () => {
     it("should create a new game when valid data is provided", async () => {
-      const response = await request(app)
+      const response: Response = await request(app)
         .post("/game/start")
         .send({ name: "TestUser", difficulty: 1 });
 
@@ -34,15 +30,15 @@ describe("Game API Tests", () => {
     });
 
     it("should return 400 if name is missing", async () => {
-      const response = await request(app)
+      const response: Response = await request(app)
         .post("/game/start")
         .send({ difficulty: 1 });
       expect(response.statusCode).toBe(400);
       expect(response.body.error).toBe("Missing parameters ):");
     });
-    
+
     it("should return 400 if difficulty is missing", async () => {
-      const response = await request(app)
+      const response: Response = await request(app)
         .post("/game/start")
         .send({ name: "TestUser" });
       expect(response.statusCode).toBe(400);
@@ -52,14 +48,14 @@ describe("Game API Tests", () => {
 
   describe("POST /game/:game_id/submit", () => {
     it("should submit an answer and return correct response", async () => {
-      const startResponse = await request(app)
+      const startResponse: Response = await request(app)
         .post("/game/start")
         .send({ name: "TestUser", difficulty: 1 });
 
       const gameId = startResponse.body.submit_url.split("/")[2];
-      const submitResponse = await request(app)
+      const submitResponse: Response = await request(app)
         .post(`/game/${gameId}/submit`)
-        .send({ answer: 10 }); // Example answer
+        .send({ answer: 10 }); 
 
       expect(submitResponse.statusCode).toBe(200);
       expect(submitResponse.body).toHaveProperty("result");
@@ -69,21 +65,22 @@ describe("Game API Tests", () => {
       expect(submitResponse.body).toHaveProperty("question");
     });
 
-    it("should return 400 if game_id is invalid", async () => {
-      const response = await request(app)
-        .post("/game/12345/submit")
+    it("should return 404 if game_id is invalid (not a valid numeric ID)", async () => {
+      
+      const response: Response = await request(app)
+        .post("/game/abc/submit")
         .send({ answer: 10 });
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error).toBe("Invalid game ID ):");
+      expect(response.statusCode).toBe(404);
+      expect(response.body.error).toBe("Game not found ):");
     });
 
     it("should return 400 if no answer is provided", async () => {
-      const startResponse = await request(app)
+      const startResponse: Response = await request(app)
         .post("/game/start")
         .send({ name: "TestUser", difficulty: 1 });
       const gameId = startResponse.body.submit_url.split("/")[2];
 
-      const response = await request(app)
+      const response: Response = await request(app)
         .post(`/game/${gameId}/submit`)
         .send({});
       expect(response.statusCode).toBe(400);
@@ -91,8 +88,8 @@ describe("Game API Tests", () => {
     });
 
     it("should return 404 if game is not found", async () => {
-      const nonExistentId = new mongoose.Types.ObjectId().toString();
-      const response = await request(app)
+      const nonExistentId = 999999;
+      const response: Response = await request(app)
         .post(`/game/${nonExistentId}/submit`)
         .send({ answer: 10 });
       expect(response.statusCode).toBe(404);
@@ -102,12 +99,14 @@ describe("Game API Tests", () => {
 
   describe("GET /game/:game_id/status", () => {
     it("should return the game status for a valid game_id", async () => {
-      const startResponse = await request(app)
+      const startResponse: Response = await request(app)
         .post("/game/start")
         .send({ name: "TestUser", difficulty: 1 });
       const gameId = startResponse.body.submit_url.split("/")[2];
 
-      const statusResponse = await request(app).get(`/game/${gameId}/status`);
+      const statusResponse: Response = await request(app).get(
+        `/game/${gameId}/status`
+      );
       expect(statusResponse.statusCode).toBe(200);
       expect(statusResponse.body).toHaveProperty("name", "TestUser");
       expect(statusResponse.body).toHaveProperty("difficulty", 1);
@@ -117,14 +116,16 @@ describe("Game API Tests", () => {
     });
 
     it("should return 400 if game_id is invalid", async () => {
-      const response = await request(app).get("/game/12345/status");
-      expect(response.statusCode).toBe(400);
-      expect(response.body.error).toBe("Invalid game ID ):");
+      const response: Response = await request(app).get("/game/abc/status");
+      expect(response.statusCode).toBe(404);
+      expect(response.body.error).toBe("Game not found ):");
     });
 
     it("should return 404 if game is not found", async () => {
-      const nonExistentId = new mongoose.Types.ObjectId().toString();
-      const response = await request(app).get(`/game/${nonExistentId}/status`);
+      const nonExistentId = 999999;
+      const response: Response = await request(app).get(
+        `/game/${nonExistentId}/status`
+      );
       expect(response.statusCode).toBe(404);
       expect(response.body.error).toBe("Game not found ):");
     });

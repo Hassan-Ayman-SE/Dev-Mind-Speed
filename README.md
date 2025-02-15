@@ -1,9 +1,9 @@
 # Dev-Mind-Speed
 
-## Overview
 
-**Dev Mind Speed** is a backend-based math game designed to test players' speed and accuracy in solving math equations through API calls. Built with Node.js, Express, and TypeScript. Integrated with a MongoDB database to manage game sessions, questions, and responses.
+## Overview (MySQL / Sequelize)
 
+**Dev Mind Speed** is a backend-based math game designed to test players’ speed and accuracy in solving math equations through API calls. Built with Node.js, Express, and TypeScript, this branch uses **MySQL with Sequelize** to manage game sessions, questions, and responses. It demonstrates how the application leverages a relational database and an ORM for data persistence and querying.
 ## Features
 
 - Start a new game with a customizable difficulty level.
@@ -18,6 +18,9 @@
 - **TypeScript**: Adds static typing for maintainable code.
 - **Express.js**: Framework for building REST APIs.
 - **MongoDB**: NoSQL database for storing game data.
+- **MySQL**: Relational database for storing game data.
+- **Sequelize**: ORM for interacting with the MySQL database.
+- **sequelize-cli**: is a command-line interface that simplifies working with Sequelize, including creating migrations, models, seeders, and managing the databaseManages environment variables.
 - **dotenv**: Manages environment variables.
 - **express-validator**: Validates incoming request data.
 - **express-rate-limit**: Protects against brute-force attacks.
@@ -31,15 +34,16 @@
 ### Prerequisites
 
 - Install [Node.js](https://nodejs.org/) (v16 or higher).
-- Install [MongoDB](https://www.mongodb.com/).
+- Install [MySQL](https://www.mysql.com/).
 
 ### Installation
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/Hassan-Ayman-SE/Dev-Mind-Speed.git
-   cd Dev-Mind-Speed
+  
+   git clone -b Dev-Mind-Speed-Task-MySQL-Sequelize https://github.com/Hassan-Ayman-SE/Dev-Mind-Speed.git 
+   cd Dev-Mind-Speed-MySQL
 
    ```
 
@@ -55,25 +59,42 @@
    - Create a .env file in the root directory and set the following:
 
    ```bash
-   MONGO_URI=mongodb://localhost:27017/dev-mind-speed-db
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_USER=root
+   DB_PASSWORD=your_mysql_password
+   DB_NAME=dev_mind_speed_db_mysql
    PORT=4000
 
    ```
 
-4. Build the project:
+4. Setup the database:
+   - Ensure that MySQL is running and that the database exists.
+   - If the database does not exist, create it manually using MySQL CLI or a database management tool (e.g., phpMyAdmin, MySQL Workbench):
+   ```bash
+   CREATE DATABASE dev_mind_speed_db_mysql;
+   ```
+5. Initialize Sequelize:
+   - Use `sequelize-cli` to create the required database structure.
+      ```bash
+      npx sequelize-cli db:migrate --config sequelize.config.js
+      ```
+   - This will apply all migrations and create the necessary tables in the dev_mind_speed_db_mysql database.
 
+
+6. Build the project:
    ```bash
    npm run build
-
    ```
 
-5. Start the server:
+
+7. Start the server:
    ```bash
    npm start
    ```
    You should see:
    ```aries
-   Connected to MongoDB
+   Connected to MySQL
    Server running at http://localhost:4000/
    ```
 

@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": "mysqlpassword1234?",
+    "database": "dev_mind_speed_db_mysql",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "mysqlpassword1234?",
+    "database": "dev_mind_speed_db_mysql_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "mysqlpassword1234?",
+    "database": "dev_mind_speed_db_mysql_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
