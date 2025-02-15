@@ -40,7 +40,7 @@ describe("Game API Tests", () => {
       expect(response.statusCode).toBe(400);
       expect(response.body.error).toBe("Missing parameters ):");
     });
-git 
+    
     it("should return 400 if difficulty is missing", async () => {
       const response = await request(app)
         .post("/game/start")
