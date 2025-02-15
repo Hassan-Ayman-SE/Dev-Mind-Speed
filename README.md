@@ -18,6 +18,9 @@
 - **TypeScript**: Adds static typing for maintainable code.
 - **Express.js**: Framework for building REST APIs.
 - **MongoDB**: NoSQL database for storing game data.
+- **MySQL**: Relational database for storing game data.
+- **Sequelize**: ORM for interacting with the MySQL database.
+- **sequelize-cli**: is a command-line interface that simplifies working with Sequelize, including creating migrations, models, seeders, and managing the databaseManages environment variables.
 - **dotenv**: Manages environment variables.
 - **express-validator**: Validates incoming request data.
 - **express-rate-limit**: Protects against brute-force attacks.
